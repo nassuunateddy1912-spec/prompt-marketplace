@@ -1,15 +1,274 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width"/>
-<title>PromptVault</title>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PromptVault - AI Prompt Marketplace</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0a0a0f;color:#f0f0f5;font-family:'DM Sans',sans-serif;min-height:100vh;}
+  nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;background:rgba(10,10,15,0.9);border-bottom:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(20px);}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;}
+  .logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#10b981);display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .beta{background:rgba(99,102,241,0.2);color:#818cf8;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;border:1px solid rgba(99,102,241,0.3);}
+  .nav-btns{display:flex;gap:10px;}
+  .btn-outline{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#d1d5db;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;}
+  .btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);border:none;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;}
+  .cart-badge{background:#ef4444;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .hero{text-align:center;padding:60px 24px 40px;position:relative;}
+  .hero-tag{display:inline-block;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);border-radius:20px;padding:4px 12px;font-size:11px;color:#818cf8;font-weight:700;margin-bottom:16px;}
+  h1{font-size:clamp(30px,6vw,56px);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:14px;background:linear-gradient(135deg,#f0f0f5 0%,#818cf8 50%,#10b981 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .hero-sub{color:#9ca3af;font-size:16px;max-width:480px;margin:0 auto 28px;line-height:1.6;}
+  .search-box{display:flex;max-width:440px;margin:0 auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;overflow:hidden;}
+  .search-box input{flex:1;background:transparent;border:none;outline:none;color:#f0f0f5;font-size:14px;padding:12px 0;font-family:inherit;}
+  .search-icon{padding:0 14px;color:#6b7280;font-size:16px;display:flex;align-items:center;}
+  .stats{display:flex;justify-content:center;gap:36px;padding:28px 24px;flex-wrap:wrap;}
+  .stat-val{font-size:24px;font-weight:900;color:#f0f0f5;letter-spacing:-1px;}
+  .stat-label{font-size:11px;color:#6b7280;margin-top:2px;}
+  .categories{display:flex;gap:8px;padding:0 24px 24px;overflow-x:auto;justify-content:center;flex-wrap:wrap;}
+  .cat-btn{padding:7px 18px;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.05);color:#9ca3af;transition:all 0.15s;white-space:nowrap;}
+  .cat-btn.active{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;padding:0 24px 60px;max-width:1100px;margin:0 auto;}
+  .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;position:relative;}
+  .card:hover{background:rgba(255,255,255,0.06);border-color:rgba(99,102,241,0.4);transform:translateY(-2px);}
+  .badge{position:absolute;top:14px;right:14px;font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.06em;}
+  .cat-tag{display:inline-block;background:rgba(99,102,241,0.12);color:#818cf8;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;margin-bottom:12px;text-transform:uppercase;}
+  .card h3{font-size:15px;font-weight:800;line-height:1.3;margin-bottom:6px;padding-right:50px;}
+  .card p{color:#9ca3af;font-size:12px;line-height:1.6;margin-bottom:14px;}
+  .preview{background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 12px;margin-bottom:14px;font-family:monospace;font-size:10px;color:#6b7280;line-height:1.5;border:1px solid rgba(255,255,255,0.06);}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;}
+  .price{font-size:20px;font-weight:900;}
+  .meta{font-size:10px;color:#6b7280;margin-top:2px;}
+  .add-btn{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:700;}
+  .modal-bg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal{background:#12121a;border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:28px;max-width:500px;width:100%;}
+  .modal-header{display:flex;justify-content:space-between;margin-bottom:16px;}
+  .close-btn{background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer;}
+  .modal h2{font-size:20px;font-weight:900;margin-bottom:8px;}
+  .modal p{color:#9ca3af;margin-bottom:16px;line-height:1.6;font-size:14px;}
+  .modal-preview{background:rgba(0,0,0,0.4);border-radius:10px;padding:14px;font-family:monospace;font-size:11px;color:#818cf8;line-height:1.7;margin-bottom:20px;border:1px solid rgba(99,102,241,0.2);}
+  .modal-footer{display:flex;justify-content:space-between;align-items:center;}
+  .buy-btn{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:12px;padding:12px 24px;cursor:pointer;font-size:14px;font-weight:800;}
+  .sidebar{position:fixed;right:0;top:0;bottom:0;width:320px;background:#12121a;border-left:1px solid rgba(255,255,255,0.1);padding:24px;display:flex;flex-direction:column;z-index:300;}
+  .sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+  .sidebar h2{font-size:18px;font-weight:900;}
+  .cart-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .cart-item-name{font-weight:700;font-size:13px;margin-bottom:2px;}
+  .cart-item-cat{color:#6b7280;font-size:11px;}
+  .remove-btn{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:6px;width:24px;height:24px;cursor:pointer;font-size:13px;}
+  .cart-total{border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;margin-top:auto;}
+  .total-row{display:flex;justify-content:space-between;margin-bottom:14px;}
+  .total-amt{font-size:20px;font-weight:900;}
+  .checkout-btn{width:100%;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:12px;padding:14px;cursor:pointer;font-size:14px;font-weight:800;}
+  .secure{text-align:center;color:#6b7280;font-size:11px;margin-top:10px;}
+  .empty-cart{color:#6b7280;text-align:center;margin-top:50px;font-size:14px;}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1e1e2e;border:1px solid rgba(99,102,241,0.4);color:#f0f0f5;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+  .overlay{position:fixed;inset:0;z-index:299;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);}
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap');
+</style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel" src="prompt-marketplace.jsx"></script>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    PromptVault
+    <span class="beta">BETA</span>
+  </div>
+  <div class="nav-btns">
+    <button class="btn-outline">Sell Prompts</button>
+    <button class="btn-primary" onclick="toggleCart()">
+      🛒 Cart <span class="cart-badge" id="cartCount" style="display:none">0</span>
+    </button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">🔥 2,400+ Prompts · New drops weekly</div>
+  <h1>The Marketplace for<br/>Premium AI Prompts</h1>
+  <p class="hero-sub">Buy and sell high-converting prompts for ChatGPT, Midjourney, Claude & more. Instant delivery.</p>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search prompts..." oninput="filterPrompts()"/>
+  </div>
+</div>
+
+<div class="stats">
+  <div><div class="stat-val">12,400+</div><div class="stat-label">Prompts Sold</div></div>
+  <div><div class="stat-val">3,200+</div><div class="stat-label">Happy Buyers</div></div>
+  <div><div class="stat-val">$2.1M+</div><div class="stat-label">Creator Earnings</div></div>
+</div>
+
+<div class="categories" id="categories">
+  <button class="cat-btn active" onclick="setCategory('All',this)">All</button>
+  <button class="cat-btn" onclick="setCategory('Image',this)">Image</button>
+  <button class="cat-btn" onclick="setCategory('Copywriting',this)">Copywriting</button>
+  <button class="cat-btn" onclick="setCategory('Business',this)">Business</button>
+  <button class="cat-btn" onclick="setCategory('Gaming',this)">Gaming</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal" style="display:none" onclick="closeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="cat-tag" id="modalCat"></span>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <h2 id="modalTitle"></h2>
+    <p id="modalDesc"></p>
+    <div class="modal-preview" id="modalPreview"></div>
+    <div class="modal-footer">
+      <div>
+        <div class="price" id="modalPrice"></div>
+        <div class="meta" id="modalMeta"></div>
+      </div>
+      <button class="buy-btn" id="modalBuyBtn">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cart Sidebar -->
+<div class="overlay" id="overlay" style="display:none" onclick="toggleCart()"></div>
+<div class="sidebar" id="sidebar" style="display:none">
+  <div class="sidebar-header">
+    <h2>Your Cart (<span id="cartLen">0</span>)</h2>
+    <button class="close-btn" onclick="toggleCart()">×</button>
+  </div>
+  <div id="cartItems" style="flex:1;overflow-y:auto"></div>
+  <div class="cart-total" id="cartTotal" style="display:none">
+    <div class="total-row"><span style="color:#9ca3af">Total</span><span class="total-amt" id="totalAmt">$0</span></div>
+    <button class="checkout-btn">Checkout</button>
+    <div class="secure">🔒 Secure checkout · Instant delivery</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+const prompts = [
+  {id:1,title:"Ultra-Realistic Product Photography",category:"Image",price:29,rating:4.9,sales:312,seller:"VisualAI",badge:"Bestseller",badgeColor:"#f59e0b",desc:"Generate studio-quality product shots with perfect lighting, shadows, and backgrounds for any item.",preview:"Shot on white background, 8k, product photography, studio lighting, shadow..."},
+  {id:2,title:"Viral Twitter Thread Generator",category:"Copywriting",price:19,rating:4.8,sales:540,seller:"GrowthHacks",badge:"Hot",badgeColor:"#ef4444",desc:"Turn any idea into a punchy, engaging Twitter thread that gets shares and followers.",preview:"Write a viral Twitter thread about [TOPIC]. Hook: make it controversial..."},
+  {id:3,title:"SaaS Landing Page Copy",category:"Copywriting",price:39,rating:5.0,sales:198,seller:"ConvertCopy",badge:"Top Rated",badgeColor:"#8b5cf6",desc:"Complete landing page copy with headline, subheadline, features, social proof, and CTA.",preview:"You are a world-class SaaS copywriter. Write a full landing page for..."},
+  {id:4,title:"AI Character Creator (RPG)",category:"Gaming",price:14,rating:4.7,sales:890,seller:"QuestForge",badge:"Popular",badgeColor:"#3b82f6",desc:"Build deeply detailed RPG characters with backstory, stats, personality and voice.",preview:"Create an RPG character with the following traits: [NAME], [CLASS], [RACE]..."},
+  {id:5,title:"CEO Email Cold Outreach",category:"Business",price:49,rating:4.9,sales:127,seller:"SalesAI",badge:"Premium",badgeColor:"#10b981",desc:"Hyper-personalized cold emails targeting C-suite executives that actually get replies.",preview:"Write a cold email to a CEO of a [INDUSTRY] company. Subject line must..."},
+  {id:6,title:"Midjourney Style Transfer Pack",category:"Image",price:24,rating:4.6,sales:443,seller:"StyleLab",badge:"New",badgeColor:"#6366f1",desc:"10 cinematic style modifiers to instantly transform any image into a movie scene.",preview:"--style cinematic, anamorphic lens, film grain, golden hour, shot on ARRI..."},
+];
+
+let cart = [];
+let activeCategory = "All";
+let selectedPrompt = null;
+
+function renderGrid() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = prompts.filter(p =>
+    (activeCategory === "All" || p.category === activeCategory) &&
+    (p.title.toLowerCase().includes(search) || p.category.toLowerCase().includes(search))
+  );
+  const grid = document.getElementById('grid');
+  grid.innerHTML = filtered.map(p => `
+    <div class="card" onclick="openModal(${p.id})">
+      <span class="badge" style="background:${p.badgeColor}22;color:${p.badgeColor};border:1px solid ${p.badgeColor}44">${p.badge}</span>
+      <div class="cat-tag">${p.category}</div>
+      <h3>${p.title}</h3>
+      <p>${p.desc}</p>
+      <div class="preview">${p.preview}</div>
+      <div class="card-footer">
+        <div>
+          <div class="price">$${p.price}</div>
+          <div class="meta">⭐ ${p.rating} · ${p.sales} sales · by ${p.seller}</div>
+        </div>
+        <button class="add-btn" onclick="event.stopPropagation();addToCart(${p.id})">Add to Cart</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setCategory(cat, btn) {
+  activeCategory = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+function filterPrompts() { renderGrid(); }
+
+function openModal(id) {
+  selectedPrompt = prompts.find(p => p.id === id);
+  document.getElementById('modalCat').textContent = selectedPrompt.category;
+  document.getElementById('modalTitle').textContent = selectedPrompt.title;
+  document.getElementById('modalDesc').textContent = selectedPrompt.desc;
+  document.getElementById('modalPreview').innerHTML = `🔒 Full prompt unlocked after purchase<br><span style="color:#6b7280">Preview: ${selectedPrompt.preview}</span>`;
+  document.getElementById('modalPrice').textContent = `$${selectedPrompt.price}`;
+  document.getElementById('modalMeta').textContent = `⭐ ${selectedPrompt.rating} · ${selectedPrompt.sales} sales`;
+  document.getElementById('modalBuyBtn').textContent = `Buy Now — $${selectedPrompt.price}`;
+  document.getElementById('modalBuyBtn').onclick = () => { addToCart(selectedPrompt.id); closeModal(); };
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+function addToCart(id) {
+  const p = prompts.find(p => p.id === id);
+  if (!cart.find(c => c.id === id)) {
+    cart.push(p);
+    updateCart();
+    showToast(`"${p.title}" added to cart!`);
+  } else {
+    showToast("Already in your cart.");
+  }
+}
+
+function updateCart() {
+  const count = cart.length;
+  const badge = document.getElementById('cartCount');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  document.getElementById('cartLen').textContent = count;
+  const items = document.getElementById('cartItems');
+  if (count === 0) {
+    items.innerHTML = '<div class="empty-cart">Your cart is empty.<br/>Add some prompts!</div>';
+    document.getElementById('cartTotal').style.display = 'none';
+  } else {
+    items.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div><div class="cart-item-name">${item.title}</div><div class="cart-item-cat">${item.category}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-weight:800">$${item.price}</span>
+          <button class="remove-btn" onclick="removeFromCart(${item.id})">×</button>
+        </div>
+      </div>
+    `).join('');
+    const total = cart.reduce((s,p) => s+p.price, 0);
+    document.getElementById('totalAmt').textContent = `$${total}`;
+    document.getElementById('cartTotal').style.display = 'block';
+  }
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(c => c.id !== id);
+  updateCart();
+}
+
+function toggleCart() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const isOpen = sidebar.style.display !== 'none';
+  sidebar.style.display = isOpen ? 'none' : 'flex';
+  overlay.style.display = isOpen ? 'none' : 'block';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✅ ' + msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+renderGrid();
+updateCart();
+</script>
 </body>
 </html>
