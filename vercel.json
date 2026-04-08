@@ -1,0 +1,8 @@
+{
+  "builds": [
+    {
+      "src": "prompt-marketplace.jsx",
+      "use": "@vercel/static-build"
+    }
+  ]
+}
