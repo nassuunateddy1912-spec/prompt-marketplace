@@ -1,8 +1,5 @@
 {
-  "builds": [
-    {
-      "src": "prompt-marketplace.jsx",
-      "use": "@vercel/static-build"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
